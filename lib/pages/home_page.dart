@@ -22,34 +22,42 @@ class _HomepageState extends State<Homepage> {
   }
 
   loadData() async {
+    await Future.delayed(Duration(seconds: 2));
     final catalogJson =
         await rootBundle.loadString("assets/files/catalog.json");
-    // print(catalogJson);
     final decodedData = jsonDecode(catalogJson);
     var productsData = decodedData["products"];
-    print(productsData);
+    CatalogModel.items = List.from(productsData)
+        .map<Item>((item) => Item.fromMap(item))
+        .toList();
+    setState(() {});
   }
 
+  @override
   Widget build(BuildContext context) {
-    final dummyList = List.generate(5, (index) => CatalogModel.items[0]);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Catlog App",
-          // textAlign: TextAlign.center,
-        ),
+        title: Text("Catalog App"),
       ),
-      body: ListView.builder(
-        itemCount: dummyList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ItemWidget(
-            item: dummyList[index],
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: (CatalogModel.items != null && CatalogModel.items!.isNotEmpty)
+            ? ListView.builder(
+                itemCount: CatalogModel.items!.length,
+                itemBuilder: (context, index) => ItemWidget(
+                  item: CatalogModel.items![index],
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
       ),
-      drawer: Mydrawer(),
+      drawer: MyDrawer(),
     );
   }
 }
+
+MyDrawer() {}
+
 // elevation: 0.0,
         // backgroundColor: Colors.white,// style: TextStyle(color: Colors.black),// iconTheme: IconThemeData(color: Colors.black),
